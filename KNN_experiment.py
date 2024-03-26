@@ -1,11 +1,7 @@
-import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import time
 from sklearn.model_selection import train_test_split
-from sklearn import svm
-
-from auxiliar_classes.process_data import ProcessDataset
 from auxiliar_classes.classifiers import KNNConfig
 from auxiliar_classes.process_data import ShowResuls
 
@@ -67,10 +63,10 @@ class KNNExperiment(ShowResuls):
         scores = []
         times_predict = []
         times_train = []
-        predictions_KNN=[]
 
         for n in range(self.iterations):
             print("ITERATION: ", n)
+            predictions_KNN=[]
             X_train, X_test, y_train, y_test = train_test_split(self.x, self.y, random_state = n+1)
             knn_model = KNNConfig(k_neighbors, X_train, y_train, X_test, y_test)
             ini_train = time.time()
@@ -84,8 +80,7 @@ class KNNExperiment(ShowResuls):
             registred_time_predict=(time.time() - ini_predict)
             times_predict.append(registred_time_predict)
             predictions_KNN.append(y_predict_KNN)
-
-            self.create_confusion_matrix(y_test, predictions_KNN[scores.index(max(scores))],'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
+            self.create_confusion_matrix(y_test, predictions_KNN[0],'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
 
 
         print(f"Media scores {self.text}: {np.mean(scores)}")
