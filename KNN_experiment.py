@@ -66,7 +66,6 @@ class KNNExperiment(ShowResuls):
 
         for n in range(self.iterations):
             print("ITERATION: ", n)
-            predictions_KNN=[]
             X_train, X_test, y_train, y_test = train_test_split(self.x, self.y, random_state = n+1)
             knn_model = KNNConfig(k_neighbors, X_train, y_train, X_test, y_test)
             ini_train = time.time()
@@ -79,8 +78,7 @@ class KNNExperiment(ShowResuls):
             y_predict_KNN= knn_model.KNN_predict()
             registred_time_predict=(time.time() - ini_predict)
             times_predict.append(registred_time_predict)
-            predictions_KNN.append(y_predict_KNN)
-            self.create_confusion_matrix(y_test, predictions_KNN[0],'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
+            self.create_confusion_matrix(y_test, y_predict_KNN,'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
 
 
         print(f"Media scores {self.text}: {np.mean(scores)}")
