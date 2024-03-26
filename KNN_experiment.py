@@ -21,7 +21,7 @@ class KNNExperiment(ShowResuls):
         all_train_times = []
         neighbors=list(range(1, max_k+1))
         for n in range(self.iterations):
-            print("ITERATION: ", n)
+            print("KNN ITERATION: ", n)
             X_train, X_test, y_train, y_test = train_test_split(self.x, self.y, random_state = n+1)
             scores=[]
             times_predict=[]
@@ -50,16 +50,16 @@ class KNNExperiment(ShowResuls):
             self.save_data(neighbors, times_predict, "Predicton time", "k", "ms", str(self.directory)+'KNN_img/times/KNN_study_times_predict'+str(self.text), n)
             
             
-            print(f"Máximo: {max(scores)}, indice: {scores.index(max(scores))+1}")
-            print(f"Tiempo de entrenamiento con mejor score para el caso {n}: {times_train[scores.index(max(scores))]*1000:.3f} ms ")
-            print(f"Tiempo de prediccion con mejor score para el caso {n}: {times_predict[scores.index(max(scores))]*1000:.3f} ms ")
+            print(f"KNN Máximo: {max(scores)}, indice: {scores.index(max(scores))+1}")
+            print(f"KNN Tiempo de entrenamiento con mejor score para el caso {n}: {times_train[scores.index(max(scores))]*1000:.3f} ms ")
+            print(f"KNN Tiempo de prediccion con mejor score para el caso {n}: {times_predict[scores.index(max(scores))]*1000:.3f} ms ")
             self.create_confusion_matrix(y_test, predictions_KNN[scores.index(max(scores))],'KNN_img/confusion_matrix/KNN_confusion_matrix_'+str(self.text), n)
 
         self.save_average_data(neighbors, all_scores, "Average score", "k", "% success", str(self.directory)+'KNN_img/average_scores/KNN_average_scores'+str(self.text))
         self.save_average_data(neighbors, all_train_times, "Average trainign time", "k", "ms", str(self.directory)+'KNN_img/average_times/KNN_average_times_train'+str(self.text))
         self.save_average_data(neighbors, all_predict_times, "Average predict time", "k", "ms", str(self.directory)+'KNN_img/average_times/KNN_average_times_predict'+str(self.text))
 
-    def KNN_experiment(self, k_neighbors):
+    def SVM_experiment(self, k_neighbors):
         scores = []
         times_predict = []
         times_train = []
@@ -81,12 +81,12 @@ class KNNExperiment(ShowResuls):
             self.create_confusion_matrix(y_test, y_predict_KNN,'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
 
 
-        print(f"Media scores {self.text}: {np.mean(scores)}")
-        print(f"Desv. típica scores {self.text}: {np.std(scores)}")
-        print(f"Media tiempo entrenamient {self.text}: {np.mean(times_train)*1000} ms")
-        print(f"Desv. típica tiempo entrenamiento {self.text}: {np.std(times_train)*1000} ms")
-        print(f"Media tiempo predicción {self.text}: {np.mean(times_predict)*1000} ms")
-        print(f"Desv. típica tiempo predicción {self.text}: {np.std(times_predict)*1000} ms")
+        print(f"KNN Media scores {self.text}: {np.mean(scores)}")
+        print(f"KNN Desv. típica scores {self.text}: {np.std(scores)}")
+        print(f"KNN Media tiempo entrenamient {self.text}: {np.mean(times_train)*1000} ms")
+        print(f"KNN Desv. típica tiempo entrenamiento {self.text}: {np.std(times_train)*1000} ms")
+        print(f"KNN Media tiempo predicción {self.text}: {np.mean(times_predict)*1000} ms")
+        print(f"KNN Desv. típica tiempo predicción {self.text}: {np.std(times_predict)*1000} ms")
         
  
 
