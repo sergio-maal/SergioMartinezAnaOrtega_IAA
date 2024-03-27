@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from auxiliar_classes.classifiers import SVMConfig
 from auxiliar_classes.process_data import ShowResuls
 from functools import reduce
+import os
 
 class SVMExperiment(ShowResuls):
     def __init__(self, X, Y, iterations, text, directory):
@@ -15,15 +16,19 @@ class SVMExperiment(ShowResuls):
         df_orig=pd.read_csv(str(directory)+'train.csv', sep=',', na_values=[" "])
         self.df = df_orig.dropna(axis=0)
         self.text = text
+        self.create_img_directories()
+
+    def create_img_directories(self):
+        names = ['SVM_img', 'SVM_img/scores', 'SVM_img/times', 'SVM_img/confusion_matrix', 'SVM_img/average_scores', 'SVM_img/average_times']
+        for name in names:
+            directory_path = os.path.join(self.directory, name)
+            if not os.path.isdir(directory_path):
+                os.mkdir(directory_path)
 
     def search_best_params(self, svm_params):
         kernels = svm_params['kernels']
         c_values = svm_params['rbf_c']
         gamma_values = svm_params['rbf_gamma']
-        all_scores =  []
-        all_predict_times = []
-        all_train_times = []
-        #neighbors=list(range(1, max_k+1))
         for kernel in kernels:
             if kernel == 'linear':
                 all_linear_scores =  []
@@ -83,22 +88,28 @@ class SVMExperiment(ShowResuls):
                             if n==0:
                                 params.append(str([c,gamma]))
 
+
+                    all_scores.append(rbf_scores)
+                    all_train_times.append(rbf_times_train)
+                    all_predict_times.append(rbf_times_predict)
+                    
                     best_scores = [score for score in rbf_scores if score >= 0.9]
                     best_scores_index = [index for index, score in enumerate(rbf_scores) if score >= 0.9]
                     best_params = [params[index] for index in best_scores_index]
                     best_training_times = [rbf_times_train[index]*1000 for index in best_scores_index]
                     best_predict_times = [rbf_times_predict[index]*1000 for index in best_scores_index]
-            
-                    all_scores.append(rbf_scores)
-                    all_train_times.append(rbf_times_train)
-                    all_predict_times.append(rbf_times_predict)
+
                     all_best_index.append(best_scores_index)
 
                     self.save_data(best_params, best_scores, "Best scores (>90%)", "params (c,gamma)", "% success", str(self.directory)+'SVM_img/scores/SVM_best_scores'+str(self.text), n)
                     self.save_data(best_params, best_training_times, "Training time in best scores", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/times/SVM_best_score_times_train'+str(self.text), n)
                     self.save_data(best_params, best_predict_times, "Predicton time in best scores", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/times/SVM_best_score_times_predict'+str(self.text), n)
 
-                    print(f"SVM Máximo: {max(rbf_scores)}, Params: {params[rbf_scores.index(max(rbf_scores))]}")
+                    print(f"SVM Scores > 90% para el caso {n}: {best_scores}")
+                    print(f"SVM Tiempos de entrenamiento para los mejores scores en {n}: {best_training_times}")
+                    print(f"SVM Tiempos de predicción para los mejores scores en {n}: {best_predict_times}")
+                    print(f"Parámetros de los mejores scores en {n}: {best_scores_index}", )
+                    print(f"SVM Máximo para el caso {n}: {max(rbf_scores)}, Params: {params[rbf_scores.index(max(rbf_scores))]}")
                     print(f"SVM Tiempo de entrenamiento con mejor score para el caso {n}: {rbf_times_train[rbf_scores.index(max(rbf_scores))]*1000:.3f} ms ")
                     print(f"SVM Tiempo de prediccion con mejor score para el caso {n}: {rbf_times_predict[rbf_scores.index(max(rbf_scores))]*1000:.3f} ms ")
                     self.create_confusion_matrix(y_test, predictions_SVM[rbf_scores.index(max(rbf_scores))],'SVM_img/confusion_matrix/SVM_confusion_matrix_'+str(self.text), n)
@@ -106,12 +117,10 @@ class SVMExperiment(ShowResuls):
                 common_best_index = sorted(list(reduce(set.intersection, (set(x) for x in  all_best_index))))
                 common_best_scores = [[scores[index] for index in common_best_index] for scores in all_scores]
                 common_best_training_times = [[times[index] for index in common_best_index] for times in all_train_times]
-                print(all_train_times)
                 common_best_predict_times = [[times[index] for index in common_best_index] for times in all_predict_times]
                 common_best_params = [params[index] for index, score in enumerate(all_scores[0]) if score in common_best_scores[0]]
-                print(best_params)
 
-
+                print("Parámetros comunes en todas las iteraciones: ", common_best_params)
                 self.save_average_data(common_best_params, common_best_scores, "Average best scores", "params (c,gamma)", "% success", str(self.directory)+'SVM_img/average_scores/SVM_average_best_scores'+str(self.text))
                 self.save_average_data(common_best_params, common_best_training_times, "Average best training time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/average_times/SVM_average_best_times_train'+str(self.text))
                 self.save_average_data(common_best_params, common_best_predict_times, "Average best predict time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/average_times/SVM_average_best_times_predict'+str(self.text))
@@ -122,8 +131,7 @@ class SVMExperiment(ShowResuls):
     def SVM_experiment(self, final_svm_params):
         kernel = final_svm_params['kernel']
         c = final_svm_params['c']
-        gamma = final_svm_params['k']
-
+        gamma = final_svm_params['gamma']
         scores = []
         times_predict = []
         times_train = []
@@ -134,7 +142,7 @@ class SVMExperiment(ShowResuls):
             if kernel == 'linear':
                 svm_model = SVMConfig(X_train, y_train, X_test, y_test, kernel)
             elif kernel == 'rbf':
-                svm_model = SVMConfig(X_train, y_train, X_test, y_test, kernel)
+                svm_model = SVMConfig(X_train, y_train, X_test, y_test, kernel, c, gamma)
             else:
                 raise NotImplementedError
             
@@ -149,7 +157,7 @@ class SVMExperiment(ShowResuls):
             registred_time_predict=(time.time() - ini_predict)
             times_predict.append(registred_time_predict)
 
-            self.create_confusion_matrix(y_test, y_predict_SVM,'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
+            self.create_confusion_matrix(y_test, y_predict_SVM,'SVM_img/confusion_matrix/SVM_Final_confusion_matrix_'+str(self.text), n)
 
 
         print(f"SVM Media scores {self.text}: {np.mean(scores)}")

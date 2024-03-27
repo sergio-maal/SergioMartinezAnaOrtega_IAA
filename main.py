@@ -36,19 +36,20 @@ class Run_Experiments(ProcessDataset):
             X_norm, loss = self.PCA_projection(X_norm, self.PCA_components)
             print("PCA LOSS: ", loss)
 
-        knn_experiment = KNNExperiment(X_norm, Y_readed, self.iterations, self.text, self.directory)
-        #knn_experiment.search_best_K(self.knn_params['max_k'])
-        #knn_experiment.KNN_experiment(self.knn_params['final_k'])
+        # knn_experiment = KNNExperiment(X_norm, Y_readed, self.iterations, self.text, self.directory)
+        # knn_experiment.search_best_K(self.knn_params['max_k'])
+        # knn_experiment.KNN_experiment(self.knn_params['final_k'])
 
         svm_experiment = SVMExperiment(X_norm, Y_readed, self.iterations, self.text, self.directory)
-        svm_experiment.search_best_params(self.svm_params)
+        svm_experiment.search_best_params(self.svm_params['search_best_params'])
+        svm_experiment.SVM_experiment(self.svm_params['final_params'])
         
 
 
 def main():
     PCA_parameters = [False, True]
     knn_params = {'max_k':300, 'final_k':175}
-    svm_params = {'kernels':['linear', 'rbf'], 'rbf_c':[0.001,0.01,0.1,1,10,100,1000], 'rbf_gamma':[0.001,0.01,0.1,1,10,100,1000]}
+    svm_params = {'search_best_params':{'kernels':['linear', 'rbf'], 'rbf_c':[0.001,0.01,0.1,1,10,100,1000], 'rbf_gamma':[0.001,0.01,0.1,1,10,100,1000]}, 'final_params':{'kernel':'rbf', 'c':1000, 'gamma':0.001}}
 
     for param in PCA_parameters:
         experiments = Run_Experiments(knn_params, svm_params, balanced_data=False, apply_PCA=param, PCA_components=15, iterations=5)
