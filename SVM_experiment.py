@@ -4,6 +4,7 @@ import time
 from sklearn.model_selection import train_test_split
 from auxiliar_classes.classifiers import SVMConfig
 from auxiliar_classes.process_data import ShowResuls
+from functools import reduce
 
 class SVMExperiment(ShowResuls):
     def __init__(self, X, Y, iterations, text, directory):
@@ -53,9 +54,10 @@ class SVMExperiment(ShowResuls):
                 print(f"SVM Linear model. Desviación típica del tiempo de predicción {self.text}: {np.std(all_linear_predict_times)}")
 
             elif kernel == 'rbf':
-                all_rbf_scores =  []
-                all_rbf_predict_times = []
-                all_rbf_train_times = []
+                all_scores =  []
+                all_predict_times = []
+                all_train_times = []
+                all_best_index = []
                 params = []
                 for n in range(self.iterations):
                     print("SVM RBF model. ITERATION: ", n)
@@ -81,24 +83,38 @@ class SVMExperiment(ShowResuls):
                             if n==0:
                                 params.append(str([c,gamma]))
 
-                    all_rbf_scores.append(rbf_scores)
-                    all_rbf_train_times.append(rbf_times_predict)
-                    all_rbf_predict_times.append(rbf_times_predict)
+                    best_scores = [score for score in rbf_scores if score >= 0.9]
+                    best_scores_index = [index for index, score in enumerate(rbf_scores) if score >= 0.9]
+                    best_params = [params[index] for index in best_scores_index]
+                    best_training_times = [rbf_times_train[index]*1000 for index in best_scores_index]
+                    best_predict_times = [rbf_times_predict[index]*1000 for index in best_scores_index]
+            
+                    all_scores.append(rbf_scores)
+                    all_train_times.append(rbf_times_train)
+                    all_predict_times.append(rbf_times_predict)
+                    all_best_index.append(best_scores_index)
 
-                    self.save_data(params, rbf_scores, "Score", "params (c,gamma)", "% success", str(self.directory)+'SVM_img/scores/SVM_study_scores'+str(self.text), n)
-                    self.save_data(params, rbf_times_train, "Training time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/times/SVM_study_times_train'+str(self.text), n)
-                    self.save_data(params, rbf_times_predict, "Predicton time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/times/SVM_study_times_predict'+str(self.text), n)
+                    self.save_data(best_params, best_scores, "Best scores (>90%)", "params (c,gamma)", "% success", str(self.directory)+'SVM_img/scores/SVM_best_scores'+str(self.text), n)
+                    self.save_data(best_params, best_training_times, "Training time in best scores", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/times/SVM_best_score_times_train'+str(self.text), n)
+                    self.save_data(best_params, best_predict_times, "Predicton time in best scores", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/times/SVM_best_score_times_predict'+str(self.text), n)
 
-                    print(rbf_scores)
-                    print(params[rbf_scores.index(max(rbf_scores))])
                     print(f"SVM Máximo: {max(rbf_scores)}, Params: {params[rbf_scores.index(max(rbf_scores))]}")
                     print(f"SVM Tiempo de entrenamiento con mejor score para el caso {n}: {rbf_times_train[rbf_scores.index(max(rbf_scores))]*1000:.3f} ms ")
                     print(f"SVM Tiempo de prediccion con mejor score para el caso {n}: {rbf_times_predict[rbf_scores.index(max(rbf_scores))]*1000:.3f} ms ")
                     self.create_confusion_matrix(y_test, predictions_SVM[rbf_scores.index(max(rbf_scores))],'SVM_img/confusion_matrix/SVM_confusion_matrix_'+str(self.text), n)
 
-                self.save_average_data(params, all_rbf_scores, "Average score", "params (c,gamma)", "% success", str(self.directory)+'SVM_img/average_scores/SVM_average_scores'+str(self.text))
-                self.save_average_data(params, all_rbf_train_times, "Average trainign time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/average_times/SVM_average_times_train'+str(self.text))
-                self.save_average_data(params, all_rbf_predict_times, "Average predict time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/average_times/SVM_average_times_predict'+str(self.text))
+                common_best_index = sorted(list(reduce(set.intersection, (set(x) for x in  all_best_index))))
+                common_best_scores = [[scores[index] for index in common_best_index] for scores in all_scores]
+                common_best_training_times = [[times[index] for index in common_best_index] for times in all_train_times]
+                print(all_train_times)
+                common_best_predict_times = [[times[index] for index in common_best_index] for times in all_predict_times]
+                common_best_params = [params[index] for index, score in enumerate(all_scores[0]) if score in common_best_scores[0]]
+                print(best_params)
+
+
+                self.save_average_data(common_best_params, common_best_scores, "Average best scores", "params (c,gamma)", "% success", str(self.directory)+'SVM_img/average_scores/SVM_average_best_scores'+str(self.text))
+                self.save_average_data(common_best_params, common_best_training_times, "Average best training time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/average_times/SVM_average_best_times_train'+str(self.text))
+                self.save_average_data(common_best_params, common_best_predict_times, "Average best predict time", "params (c,gamma)", "ms", str(self.directory)+'SVM_img/average_times/SVM_average_best_times_predict'+str(self.text))
 
             else:
                 raise NotImplementedError

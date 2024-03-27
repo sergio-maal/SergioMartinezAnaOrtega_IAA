@@ -71,6 +71,7 @@ class ShowResuls():
         plt.title(title, fontsize=15)
         plt.xlabel(labelx, fontsize=12)
         plt.ylabel(labely, fontsize=12)
+        plt.xticks(fontsize=8)
         plt.savefig(str(dir_name)+'_'+str(n)+'.jpg')
         plt.close() 
 
