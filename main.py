@@ -53,9 +53,9 @@ class Run_Experiments(ProcessDataset):
 
         # Ejecución de los experimentos
         # Se realiza primero una búsqueda de parámetros y después se realiza un experimento final con los mejores    
-        # knn_experiment = KNNExperiment(X_norm, Y_readed, self.iterations, self.text, self.directory)
-        # knn_experiment.search_best_K(self.knn_params['max_k'])
-        # knn_experiment.KNN_experiment(self.knn_params['final_k'])
+        knn_experiment = KNNExperiment(X_norm, Y_readed, self.iterations, self.text, self.directory)
+        knn_experiment.search_best_K(self.knn_params['max_k'])
+        knn_experiment.KNN_experiment(self.knn_params['final_k'])
 
         svm_experiment = SVMExperiment(X_norm, Y_readed, self.iterations, self.text, self.directory)
         svm_experiment.search_best_params(self.svm_params['search_best_params'])
