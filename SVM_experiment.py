@@ -48,26 +48,26 @@ class SVMExperiment(ShowResuls):
                     ini_train = time.time()
                     svm_results = svm_model.SVM_training()
                     registred_time_train =(time.time() - ini_train)
-                    all_linear_train_times.append(registred_time_train)
+                    all_linear_train_times.append(registred_time_train*1000)
                     score = svm_results.score(X_test, y_test)
                     all_linear_scores.append(score)
                     # Predicción de clases en el test y refistro del tiempo 
                     ini_predict = time.time() 
                     y_predict_SVM = svm_model.SVM_predict()
                     registred_time_predict=(time.time() - ini_predict)
-                    all_linear_predict_times.append(registred_time_predict)
+                    all_linear_predict_times.append(registred_time_predict*1000)
                     # Se crea la matriz de confusión de cada iteración
                     self.create_confusion_matrix(y_test, y_predict_SVM,'SVM_img/confusion_matrix/SVM_Linear_confusion_matrix_'+str(self.text), n)
                     # Se imprime por pantalla el score y tiempos de entrnamiento y predicción de cada iteración
-                    print(f"Score: {score} Training time: {registred_time_train*1000} ms Predict time: {registred_time_predict*1000} ms")
+                    print(f"Score: {score} Training time: {registred_time_train} ms Predict time: {registred_time_predict} ms")
                 
                 # Se imprime por pantalla la media y desv.típica de los scores y tiempos de entrenamiento y predicción
                 print(f"SVM Linear model. Media de las scores {self.text}: {np.average(all_linear_scores)}")
                 print(f"SVM Linear model. Desviación típica de las scores {self.text}: {np.std(all_linear_scores)}")
-                print(f"SVM Linear model. Media del tiempo de entrenamiento {self.text}: {np.average(all_linear_train_times)}")
-                print(f"SVM Linear model. Desviación típica del tiempo de entrenamiento {self.text}: {np.std(all_linear_train_times)}")
-                print(f"SVM Linear model. Media del tiempo de predicción {self.text}: {np.average(all_linear_predict_times)}")
-                print(f"SVM Linear model. Desviación típica del tiempo de predicción {self.text}: {np.std(all_linear_predict_times)}")
+                print(f"SVM Linear model. Media del tiempo de entrenamiento {self.text}: {np.average(all_linear_train_times)} ms")
+                print(f"SVM Linear model. Desviación típica del tiempo de entrenamiento {self.text}: {np.std(all_linear_train_times)} ms")
+                print(f"SVM Linear model. Media del tiempo de predicción {self.text}: {np.average(all_linear_predict_times)} ms")
+                print(f"SVM Linear model. Desviación típica del tiempo de predicción {self.text}: {np.std(all_linear_predict_times)} ms")
 
             elif kernel == 'rbf':
                 all_scores =  []
@@ -92,14 +92,14 @@ class SVMExperiment(ShowResuls):
                             ini_train = time.time()
                             svm_results = svm_model.SVM_training()
                             registred_time_train =(time.time() - ini_train)
-                            rbf_times_train.append(registred_time_train)
+                            rbf_times_train.append(registred_time_train*1000)
                             score = svm_results.score(X_test, y_test)
                             rbf_scores.append(score)
                             # Predicción de clases en el test y refistro del tiempo 
                             ini_predict = time.time() 
                             y_predict_SVM = svm_model.SVM_predict()
                             registred_time_predict=(time.time() - ini_predict)
-                            rbf_times_predict.append(registred_time_predict)
+                            rbf_times_predict.append(registred_time_predict*1000)
                             predictions_SVM.append(y_predict_SVM)
                             if n==0:
                                 params.append(str([c,gamma]))
@@ -114,8 +114,8 @@ class SVMExperiment(ShowResuls):
                     best_scores = [score for score in rbf_scores if score >= 0.9]
                     best_scores_index = [index for index, score in enumerate(rbf_scores) if score >= 0.9]
                     best_params = [params[index] for index in best_scores_index]
-                    best_training_times = [rbf_times_train[index]*1000 for index in best_scores_index]
-                    best_predict_times = [rbf_times_predict[index]*1000 for index in best_scores_index]
+                    best_training_times = [rbf_times_train[index] for index in best_scores_index]
+                    best_predict_times = [rbf_times_predict[index] for index in best_scores_index]
 
                     all_best_index.append(best_scores_index)
 
@@ -126,12 +126,12 @@ class SVMExperiment(ShowResuls):
                     
                     # Se imprimen por pantalla los parámetros y tiempos del mejor score, así como los parámetros y tiempos de los que superen el 90% de score
                     print(f"SVM Scores > 90% para el caso {n}: {best_scores}")
-                    print(f"SVM Tiempos de entrenamiento para los mejores scores en {n}: {best_training_times}")
-                    print(f"SVM Tiempos de predicción para los mejores scores en {n}: {best_predict_times}")
+                    print(f"SVM Tiempos de entrenamiento para los mejores scores en {n}: {best_training_times} ms")
+                    print(f"SVM Tiempos de predicción para los mejores scores en {n}: {best_predict_times} ms")
                     print(f"Parámetros de los mejores scores en {n}: {best_scores_index}", )
                     print(f"SVM Máximo para el caso {n}: {max(rbf_scores)}, Params: {params[rbf_scores.index(max(rbf_scores))]}")
-                    print(f"SVM Tiempo de entrenamiento con mejor score para el caso {n}: {rbf_times_train[rbf_scores.index(max(rbf_scores))]*1000:.3f} ms ")
-                    print(f"SVM Tiempo de prediccion con mejor score para el caso {n}: {rbf_times_predict[rbf_scores.index(max(rbf_scores))]*1000:.3f} ms ")
+                    print(f"SVM Tiempo de entrenamiento con mejor score para el caso {n}: {rbf_times_train[rbf_scores.index(max(rbf_scores))]:.3f} ms ")
+                    print(f"SVM Tiempo de prediccion con mejor score para el caso {n}: {rbf_times_predict[rbf_scores.index(max(rbf_scores))]:.3f} ms ")
                     self.create_confusion_matrix(y_test, predictions_SVM[rbf_scores.index(max(rbf_scores))],'SVM_img/confusion_matrix/SVM_RBF_confusion_matrix_'+str(self.text), n)
 
                 # Para el análisis final, únicamente retenemos los parámetros que superan el 90% de score en todos las iteraciones, así como sus tiempos
@@ -178,24 +178,24 @@ class SVMExperiment(ShowResuls):
             ini_train = time.time()
             svm_results = svm_model.SVM_training()
             registred_time_train=(time.time() - ini_train)
-            times_train.append(registred_time_train)
+            times_train.append(registred_time_train*1000)
             score=svm_results.score(X_test, y_test)
             scores.append(score)
             # Predicción de clases en el test y refistro del tiempo
             ini_predict = time.time() 
             y_predict_SVM= svm_model.SVM_predict()
             registred_time_predict=(time.time() - ini_predict)
-            times_predict.append(registred_time_predict)
+            times_predict.append(registred_time_predict*1000)
             # Se crea la matriz de confusión de cada iteración
             self.create_confusion_matrix(y_test, y_predict_SVM,'SVM_img/confusion_matrix/SVM_Final_confusion_matrix_'+str(self.text), n)
 
         # Se imprime por pantalla la media y desv. típica de los scores y tiempos de entrenamiento y predicción
         print(f"SVM Media scores {self.text}: {np.mean(scores)}")
         print(f"SVM Desv. típica scores {self.text}: {np.std(scores)}")
-        print(f"SVM Media tiempo entrenamient {self.text}: {np.mean(times_train)*1000} ms")
-        print(f"SVM Desv. típica tiempo entrenamiento {self.text}: {np.std(times_train)*1000} ms")
-        print(f"SVM Media tiempo predicción {self.text}: {np.mean(times_predict)*1000} ms")
-        print(f"SVM Desv. típica tiempo predicción {self.text}: {np.std(times_predict)*1000} ms")
+        print(f"SVM Media tiempo entrenamient {self.text}: {np.mean(times_train)} ms")
+        print(f"SVM Desv. típica tiempo entrenamiento {self.text}: {np.std(times_train)} ms")
+        print(f"SVM Media tiempo predicción {self.text}: {np.mean(times_predict)} ms")
+        print(f"SVM Desv. típica tiempo predicción {self.text}: {np.std(times_predict)} ms")
         
  
 

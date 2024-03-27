@@ -69,7 +69,7 @@ def main():
     # Se definen los parámetros del experimento
     PCA_parameters = [False, True]
     knn_params = {'max_k':300, 'final_k':175}
-    svm_params = {'search_best_params':{'kernels':['linear', 'rbf'], 'rbf_c':[0.001,0.01,0.1,1,10,100,1000], 'rbf_gamma':[0.001,0.01,0.1,1,10,100,1000]}, 'final_params':{'kernel':'rbf', 'c':1000, 'gamma':0.001}}
+    svm_params = {'search_best_params':{'kernels':['linear', 'rbf'], 'rbf_c':[0.001,0.01,0.1,1,10,100,1000], 'rbf_gamma':[0.001,0.01,0.1,1,10,100,1000]}, 'final_params':{'kernel':'linear', 'c':None, 'gamma':None}}
 
     # Se lanzan los experimentos llamando a la clase Run_Experiments
     for param in PCA_parameters:

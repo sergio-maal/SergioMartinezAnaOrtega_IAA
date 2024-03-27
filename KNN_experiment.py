@@ -48,14 +48,14 @@ class KNNExperiment(ShowResuls):
                 ini_train = time.time() 
                 neigh = knn_model.KNN_training()
                 registred_time_train =(time.time() - ini_train)
-                times_train.append(registred_time_train)
+                times_train.append(registred_time_train*1000)
                 score=neigh.score(X_test, y_test)
                 scores.append(score)
                 # Predicción de clases en el test y refistro del tiempo
                 ini_predict = time.time() 
                 y_predict_KNN= knn_model.KNN_predict()
                 registred_time_predict=(time.time() - ini_predict)
-                times_predict.append(registred_time_predict)
+                times_predict.append(registred_time_predict*1000)
                 predictions_KNN.append(y_predict_KNN)
 
             all_scores.append(scores)
@@ -69,8 +69,8 @@ class KNNExperiment(ShowResuls):
             
             # Se imprime por pantalla el máximo de cada iteración y su tiempo de entrenamiento y predicción
             print(f"KNN Máximo: {max(scores)}, indice: {scores.index(max(scores))+1}")
-            print(f"KNN Tiempo de entrenamiento con mejor score para el caso {n}: {times_train[scores.index(max(scores))]*1000:.3f} ms ")
-            print(f"KNN Tiempo de prediccion con mejor score para el caso {n}: {times_predict[scores.index(max(scores))]*1000:.3f} ms ")
+            print(f"KNN Tiempo de entrenamiento con mejor score para el caso {n}: {times_train[scores.index(max(scores))]:.3f} ms ")
+            print(f"KNN Tiempo de prediccion con mejor score para el caso {n}: {times_predict[scores.index(max(scores))]:.3f} ms ")
             # Se crea la matriz de confusión de cada iteración
             self.create_confusion_matrix(y_test, predictions_KNN[scores.index(max(scores))],'KNN_img/confusion_matrix/KNN_confusion_matrix_'+str(self.text), n)
         
@@ -96,24 +96,24 @@ class KNNExperiment(ShowResuls):
             ini_train = time.time()
             neigh = knn_model.KNN_training()
             registred_time_train=(time.time() - ini_train)
-            times_train.append(registred_time_train)
+            times_train.append(registred_time_train*1000)
             score=neigh.score(X_test, y_test)
             scores.append(score)
             # Predicción de clases en el test y refistro del tiempo
             ini_predict = time.time() 
             y_predict_KNN= knn_model.KNN_predict()
             registred_time_predict=(time.time() - ini_predict)
-            times_predict.append(registred_time_predict)
+            times_predict.append(registred_time_predict*1000)
             # Se crea la matriz de confusión de cada iteración
             self.create_confusion_matrix(y_test, y_predict_KNN,'KNN_img/confusion_matrix/KNN_Final_confusion_matrix_'+str(self.text), n)
 
         # Se imprime por pantalla la media y desv. típica de los scores y tiempos de entrenamiento y predicción
         print(f"KNN Media scores {self.text}: {np.mean(scores)}")
         print(f"KNN Desv. típica scores {self.text}: {np.std(scores)}")
-        print(f"KNN Media tiempo entrenamient {self.text}: {np.mean(times_train)*1000} ms")
-        print(f"KNN Desv. típica tiempo entrenamiento {self.text}: {np.std(times_train)*1000} ms")
-        print(f"KNN Media tiempo predicción {self.text}: {np.mean(times_predict)*1000} ms")
-        print(f"KNN Desv. típica tiempo predicción {self.text}: {np.std(times_predict)*1000} ms")
+        print(f"KNN Media tiempo entrenamient {self.text}: {np.mean(times_train)} ms")
+        print(f"KNN Desv. típica tiempo entrenamiento {self.text}: {np.std(times_train)} ms")
+        print(f"KNN Media tiempo predicción {self.text}: {np.mean(times_predict)} ms")
+        print(f"KNN Desv. típica tiempo predicción {self.text}: {np.std(times_predict)} ms")
         
  
 
